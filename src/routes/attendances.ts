@@ -65,10 +65,16 @@ router.post("/", async (req, res, next) => {
         ? new Date(parsed.dateOfAttendance)
         : new Date(parsed.dateOfAttendance);
 
-    const created = await AttendanceModel.create({
-      ...parsed,
+    const payload = {
+      patientName: parsed.patientName,
+      patientDocument: parsed.patientDocument,
+      coverage: parsed.coverage,
       dateOfAttendance: date,
-    });
+      totalAmount: parsed.totalAmount,
+      source: parsed.source,
+      ...(parsed.reconciliationStatus != null && { reconciliationStatus: parsed.reconciliationStatus }),
+    };
+    const created = await AttendanceModel.create(payload);
 
     res.status(201).json(created);
   } catch (err) {

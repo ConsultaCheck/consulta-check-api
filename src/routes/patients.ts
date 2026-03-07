@@ -28,7 +28,16 @@ router.get("/", async (_req, res, next) => {
 router.post("/", async (req, res, next) => {
   try {
     const parsed = patientBodySchema.parse(req.body);
-    const created = await PatientModel.create(parsed);
+    const payload = {
+      firstName: parsed.firstName,
+      lastName: parsed.lastName,
+      sex: parsed.sex,
+      coverage: parsed.coverage,
+      ...(parsed.secondLastName != null && parsed.secondLastName !== "" && { secondLastName: parsed.secondLastName }),
+      ...(parsed.documentNumber != null && parsed.documentNumber !== "" && { documentNumber: parsed.documentNumber }),
+      ...(parsed.age != null && { age: parsed.age }),
+    };
+    const created = await PatientModel.create(payload);
     res.status(201).json(created);
   } catch (err) {
     next(err);
