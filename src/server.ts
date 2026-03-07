@@ -13,14 +13,22 @@ import { authMiddleware } from "./middleware/auth";
 async function bootstrap() {
   const app = express();
 
+  const allowedOrigins = env.corsOrigin
+    ? env.corsOrigin.split(",").map((o) => o.trim()).filter(Boolean)
+    : [];
+
   app.use(
     cors({
       origin:
         env.nodeEnv === "development"
           ? "*"
-          : env.corsOrigin
-            ? env.corsOrigin.split(",").map((o) => o.trim())
-            : true,
+          : (origin: string | undefined, cb: (err: Error | null, allow?: boolean) => void) => {
+              if (!origin) return cb(null, true);
+              if (allowedOrigins.includes(origin)) return cb(null, true);
+              // Permitir cualquier despliegue de Vercel (*.vercel.app)
+              if (origin.endsWith(".vercel.app")) return cb(null, true);
+              return cb(null, false);
+            },
     }),
   );
   app.use(express.json());
