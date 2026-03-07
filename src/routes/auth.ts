@@ -27,46 +27,9 @@ router.get("/me", authMiddleware, async (req, res, next) => {
   }
 });
 
-const registerSchema = z.object({
-  email: z.string().email(),
-  name: z.string().optional(),
-  password: z.string().min(6),
-  role: z.enum(["admin", "user"]).optional(),
-});
-
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
-});
-
-router.post("/register", async (req, res, next) => {
-  try {
-    const data = registerSchema.parse(req.body);
-
-    const existing = await UserModel.findOne({ email: data.email });
-    if (existing) {
-      return res.status(409).json({ message: "El email ya está registrado" });
-    }
-
-    const passwordHash = await bcrypt.hash(data.password, 10);
-
-    const user = new UserModel({
-      email: data.email,
-      name: data.name ?? undefined,
-      passwordHash,
-      role: data.role ?? "user",
-    });
-    await user.save();
-
-    res.status(201).json({
-      id: user._id,
-      email: user.email,
-      name: user.name,
-      role: user.role,
-    });
-  } catch (err) {
-    next(err);
-  }
 });
 
 router.post("/login", async (req, res, next) => {
