@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "API REST para ConsultaCheck (asistencias, liquidaciones y reconciliación)",
   "main": "dist/server.js",
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc -p tsconfig.json",

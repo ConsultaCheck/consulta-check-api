@@ -3,7 +3,8 @@
 
 [build]
 builder = "nixpacks"
-buildCommand = "npm ci && npm run build"
+# Nixpacks ya ejecuta "npm ci" en install; solo compilamos para evitar EBUSY en .cache
+buildCommand = "npm run build"
 
 [deploy]
 startCommand = "npm start"
