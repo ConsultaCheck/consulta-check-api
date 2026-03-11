@@ -72,7 +72,7 @@ router.post("/", async (req, res, next) => {
       dateOfAttendance: date,
       totalAmount: parsed.totalAmount,
       source: parsed.source,
-      ...(parsed.reconciliationStatus != null && { reconciliationStatus: parsed.reconciliationStatus }),
+      reconciliationStatus: parsed.reconciliationStatus ?? "UNPAID",
     };
     const created = await AttendanceModel.create(payload);
 
