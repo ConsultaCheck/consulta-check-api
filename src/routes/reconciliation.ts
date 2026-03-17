@@ -149,6 +149,7 @@ router.get("/", async (req, res, next) => {
     type ReconResult = {
       id: string;
       patientName: string;
+      patientDocument?: string;
       date: string;
       coverage: string | undefined;
       amount: number;
@@ -158,6 +159,7 @@ router.get("/", async (req, res, next) => {
       suggestedMatches?: {
         id: string;
         patientName: string;
+        patientDocument?: string;
         date: string;
         amount: number;
         liquidationId?: string;
@@ -233,6 +235,7 @@ router.get("/", async (req, res, next) => {
         results.push({
           id: `att-${att._id.toString()}`,
           patientName: att.patientName,
+          patientDocument: att.patientDocument,
           date: att.dateOfAttendance.toISOString(),
           coverage: att.coverage,
           amount: att.totalAmount,
@@ -254,6 +257,7 @@ router.get("/", async (req, res, next) => {
         results.push({
           id: `att-${att._id.toString()}`,
           patientName: att.patientName,
+          patientDocument: att.patientDocument,
           date: att.dateOfAttendance.toISOString(),
           coverage: att.coverage,
           amount: att.totalAmount,
@@ -292,6 +296,7 @@ router.get("/", async (req, res, next) => {
         const recon: ReconResult = {
           id: `att-${att._id.toString()}`,
           patientName: att.patientName,
+          patientDocument: att.patientDocument,
           date: att.dateOfAttendance.toISOString(),
           coverage: att.coverage,
           amount: att.totalAmount,
@@ -304,6 +309,7 @@ router.get("/", async (req, res, next) => {
             const sm: NonNullable<ReconResult["suggestedMatches"]>[number] = {
               id: `liqitem-${i._id.toString()}`,
               patientName: i.patientName ?? "Desconocido",
+              patientDocument: i.patientDocument,
               date: (i.dateOfService ?? new Date()).toISOString(),
               amount: i.amountPaid,
             };
@@ -333,6 +339,7 @@ router.get("/", async (req, res, next) => {
       const recon: ReconResult = {
         id: `liqitem-${item._id.toString()}`,
         patientName: item.patientName ?? "Desconocido",
+        patientDocument: item.patientDocument,
         date: (item.dateOfService ?? new Date()).toISOString(),
         coverage: item.coverage,
         amount: item.amountPaid,
