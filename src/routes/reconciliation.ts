@@ -277,6 +277,8 @@ router.get("/", async (req, res, next) => {
         results.push({
           id: `att-${att._id.toString()}`,
           patientName: att.patientName,
+          // Preferimos el RUT sincronizado de la asistencia; si no existe, usamos el de la liquidación
+          patientDocument: att.patientDocument || match.patientDocument,
           date: att.dateOfAttendance.toISOString(),
           coverage: att.coverage,
           amount: att.totalAmount,
