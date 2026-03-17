@@ -72,7 +72,9 @@ router.post("/", async (req, res, next) => {
       dateOfAttendance: date,
       totalAmount: parsed.totalAmount,
       source: parsed.source,
-      reconciliationStatus: parsed.reconciliationStatus ?? "UNPAID",
+      // Importante: dejar en null por defecto para que la conciliación
+      // pueda calcular automáticamente PAID/UNPAID según la liquidación.
+      reconciliationStatus: parsed.reconciliationStatus ?? null,
     };
     const created = await AttendanceModel.create(payload);
 
