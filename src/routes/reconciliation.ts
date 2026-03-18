@@ -119,8 +119,12 @@ router.get("/", async (req, res, next) => {
     }
 
     const [attendances, items] = await Promise.all([
-      AttendanceModel.find(attFilter).lean(),
-      LiquidationItemModel.find(itemFilter).lean(),
+      AttendanceModel.find(attFilter)
+        .select("patientName patientDocument dateOfAttendance totalAmount coverage reconciliationStatus")
+        .lean(),
+      LiquidationItemModel.find(itemFilter)
+        .select("patientName patientDocument dateOfService amountPaid coverage liquidationId")
+        .lean(),
     ]);
 
     const dateStr = (d: Date) => d.toISOString().slice(0, 10);
@@ -235,7 +239,7 @@ router.get("/", async (req, res, next) => {
         results.push({
           id: `att-${att._id.toString()}`,
           patientName: att.patientName,
-          patientDocument: att.patientDocument,
+          patientDocument: att.patientDocument ?? "",
           date: att.dateOfAttendance.toISOString(),
           coverage: att.coverage,
           amount: att.totalAmount,
@@ -257,7 +261,7 @@ router.get("/", async (req, res, next) => {
         results.push({
           id: `att-${att._id.toString()}`,
           patientName: att.patientName,
-          patientDocument: att.patientDocument,
+          patientDocument: att.patientDocument ?? "",
           date: att.dateOfAttendance.toISOString(),
           coverage: att.coverage,
           amount: att.totalAmount,
@@ -274,11 +278,14 @@ router.get("/", async (req, res, next) => {
       const match = takeMatch(rutKey, dateAmountKey, att);
 
       if (match) {
+        const rut =
+          (att.patientDocument && att.patientDocument.trim() !== "" && att.patientDocument !== "-")
+            ? att.patientDocument
+            : (match.patientDocument ?? "");
         results.push({
           id: `att-${att._id.toString()}`,
           patientName: att.patientName,
-          // Preferimos el RUT sincronizado de la asistencia; si no existe, usamos el de la liquidación
-          patientDocument: att.patientDocument || match.patientDocument,
+          patientDocument: rut,
           date: att.dateOfAttendance.toISOString(),
           coverage: att.coverage,
           amount: att.totalAmount,
@@ -298,7 +305,7 @@ router.get("/", async (req, res, next) => {
         const recon: ReconResult = {
           id: `att-${att._id.toString()}`,
           patientName: att.patientName,
-          patientDocument: att.patientDocument,
+          patientDocument: att.patientDocument ?? "",
           date: att.dateOfAttendance.toISOString(),
           coverage: att.coverage,
           amount: att.totalAmount,
@@ -341,7 +348,7 @@ router.get("/", async (req, res, next) => {
       const recon: ReconResult = {
         id: `liqitem-${item._id.toString()}`,
         patientName: item.patientName ?? "Desconocido",
-        patientDocument: item.patientDocument,
+        patientDocument: item.patientDocument ?? "",
         date: (item.dateOfService ?? new Date()).toISOString(),
         coverage: item.coverage,
         amount: item.amountPaid,
@@ -353,6 +360,7 @@ router.get("/", async (req, res, next) => {
         recon.suggestedMatches = unpaidSameDate.map((r) => ({
           id: r.id,
           patientName: r.patientName,
+          patientDocument: r.patientDocument,
           date: r.date,
           amount: r.amount,
         }));
