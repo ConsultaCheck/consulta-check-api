@@ -318,7 +318,7 @@ router.get("/", async (req, res, next) => {
             const sm: NonNullable<ReconResult["suggestedMatches"]>[number] = {
               id: `liqitem-${i._id.toString()}`,
               patientName: i.patientName ?? "Desconocido",
-              patientDocument: i.patientDocument,
+              patientDocument: i.patientDocument ?? "",
               date: (i.dateOfService ?? new Date()).toISOString(),
               amount: i.amountPaid,
             };
@@ -360,7 +360,7 @@ router.get("/", async (req, res, next) => {
         recon.suggestedMatches = unpaidSameDate.map((r) => ({
           id: r.id,
           patientName: r.patientName,
-          patientDocument: r.patientDocument,
+          patientDocument: r.patientDocument ?? "",
           date: r.date,
           amount: r.amount,
         }));
